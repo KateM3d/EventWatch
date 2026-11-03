@@ -1,0 +1,63 @@
+<app-page-header heading="Overview" [description]="description()" />
+
+@if (overview.isLoading()) {
+  <div aria-busy="true" data-testid="overview-loading">
+    <p role="status" class="sr-only">Loading overview…</p>
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-hidden="true">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="card h-32 animate-pulse p-5">
+          <div class="h-3 w-24 rounded bg-slate-200"></div>
+          <div class="mt-4 h-7 w-32 rounded bg-slate-200"></div>
+          <div class="mt-4 h-3 w-20 rounded bg-slate-100"></div>
+        </div>
+      }
+    </div>
+    <div class="mt-4 grid gap-4 lg:grid-cols-3" aria-hidden="true">
+      <div class="card h-80 animate-pulse lg:col-span-2"></div>
+      <div class="card h-80 animate-pulse"></div>
+    </div>
+    <div class="card mt-4 h-72 animate-pulse" aria-hidden="true"></div>
+  </div>
+} @else if (overview.error()) {
+  <app-state-message
+    class="card"
+    kind="error"
+    icon="error"
+    heading="We couldn't load the overview"
+    message="Something went wrong while fetching analytics. Please try again."
+  >
+    <button
+      type="button"
+      class="focus-ring mt-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+      (click)="overview.reload()"
+    >
+      Try again
+    </button>
+  </app-state-message>
+} @else if (isEmpty()) {
+  <app-state-message
+    class="card"
+    heading="No events tracked yet"
+    [message]="
+      'This project has not received any events in the last ' +
+      periodLabel() +
+      '. Install the EventWatch SDK to start collecting data.'
+    "
+  />
+} @else if (overview.hasValue()) {
+  @let data = overview.value();
+  <section aria-label="Key metrics">
+    <ul class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      @for (kpi of data.kpis; track kpi.id) {
+        <li><app-kpi-card class="h-full" [kpi]="kpi" [periodLabel]="periodLabel()" /></li>
+      }
+    </ul>
+  </section>
+
+  <div class="mt-4 grid gap-4 lg:grid-cols-3">
+    <app-dau-chart class="lg:col-span-2" [points]="data.dailyActiveUsers" />
+    <app-funnel-preview [steps]="data.funnel" />
+  </div>
+
+  <app-top-events-table class="mt-4" [events]="data.topEvents" />
+}

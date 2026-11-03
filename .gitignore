@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build and test output
+dist/
+out-tsc/
+coverage/
+.angular/
+__screenshots__/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Editors and OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.history/
+*.swp
+.DS_Store
+Thumbs.db
